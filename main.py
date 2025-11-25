@@ -12,14 +12,12 @@ from models.room import Room
 def main():
     
     with My_Session() as session:
-
-
-        new_guest1 = Guest(first_name='Linus',last_name='Folkjern',email='folkjern@icloud.com')
-        new_guest2 = Guest(first_name='Elin',last_name='Sjöberg',email='elin.sjoberg@example.com')
-        new_guest3 = Guest(first_name='Marcus',last_name='Hallgren',email='marcus.hallgren@example.com')
-        new_guest4 = Guest(first_name='Tilda',last_name='Bergström',email='tilda.bergstrom@example.com')
-
-        session.add_all([new_guest1,new_guest2,new_guest3,new_guest4])
+        # Seeding
+        count = session.query(Guest).count()
+        if count == 0:
+            guests = Guest.create_guests()
+            session.add_all(guests)
+            
         session.commit()
         
         session.close()
