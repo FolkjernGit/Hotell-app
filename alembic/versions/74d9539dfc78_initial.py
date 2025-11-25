@@ -1,8 +1,8 @@
-"""added guest table
+"""initial
 
-Revision ID: 47af53fed132
+Revision ID: 74d9539dfc78
 Revises: 
-Create Date: 2025-11-23 21:09:32.969303
+Create Date: 2025-11-25 09:32:47.159782
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '47af53fed132'
+revision: str = '74d9539dfc78'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

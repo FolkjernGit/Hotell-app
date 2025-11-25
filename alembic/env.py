@@ -2,11 +2,12 @@ from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
-from alembic import context
-
-from base import Base
+from models.base import Base
 from models.guest import Guest
 from models.room import Room
+from database.db import mysql_url
+from alembic import context
+
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 mysql_url = "mysql+pymysql://root:Admin1234@localhost:3306/hotell"
