@@ -1,4 +1,5 @@
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Boolean
 from models.base import Base
 from shortcuts import pkey, s_int
 from typing import List
@@ -8,6 +9,7 @@ class Room(Base):
     id: Mapped[pkey]
     room_number: Mapped[s_int]
     room_count: Mapped[s_int] 
+    booked: Mapped[bool] = mapped_column(Boolean)
     
     @staticmethod
     def create_seeding() -> List["Room"]:
@@ -25,3 +27,4 @@ class Room(Base):
         rooms.append(new_room4)
         
         return rooms
+
