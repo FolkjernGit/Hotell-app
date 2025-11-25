@@ -12,7 +12,7 @@ class Guest(Base):
     
     # seeding
     @staticmethod
-    def create_guests() -> List["Guest"]:
+    def create_seeding() -> List["Guest"]:
         
         guests: List[Guest] = []
         
@@ -28,5 +28,3 @@ class Guest(Base):
         
         return guests
         
-    def __repr__(self) -> str_255:
-        return super().__repr__()

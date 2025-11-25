@@ -15,3 +15,4 @@ class Booking(Base):
     book_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     booked_duration: Mapped[s_int]
     
+    
