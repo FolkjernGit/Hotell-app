@@ -3,6 +3,7 @@ from sqlalchemy import Boolean
 from models.base import Base
 from shortcuts import pkey, s_int
 from typing import List
+from database.db import My_Session
 
 class Room(Base):
     __tablename__ = "rooms"
@@ -10,6 +11,26 @@ class Room(Base):
     room_number: Mapped[s_int]
     room_count: Mapped[s_int] 
     booked: Mapped[bool] = mapped_column(Boolean)
+    
+    @staticmethod
+    def show_avaible_rooms(session):
+        
+        
+        available_rooms = (
+            session.query(Room)\
+            .where(Room.booked==False)\
+            .all()
+            )
+        
+        available_room_list = ""
+        
+        for room in available_rooms:
+            available_room_list += f"Room number: {room.room_number} Room count: {room.room_count}\n"
+        
+        return available_room_list
+    
+    def book_room(self):
+        pass
     
     @staticmethod
     def create_seeding() -> List["Room"]:

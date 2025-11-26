@@ -1,5 +1,5 @@
 
-from menu import menu
+from hotell_menu import menu_interface
 from database.db import My_Session
 
 from models.guest import Guest
@@ -21,8 +21,10 @@ def main():
         if count == 0:
             rooms = Room.create_seeding()  
             session.add_all(rooms) 
-            
-        menu()
+        
+
+        
+        menu_interface()
         
         session.commit()
         
