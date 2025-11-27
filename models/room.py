@@ -3,7 +3,7 @@ from sqlalchemy import Boolean
 from models.base import Base
 from shortcuts import pkey, s_int
 from typing import List
-from database.db import My_Session
+
 
 class Room(Base):
     __tablename__ = "rooms"
@@ -14,7 +14,6 @@ class Room(Base):
     
     @staticmethod
     def show_avaible_rooms(session):
-        
         
         available_rooms = (
             session.query(Room)\

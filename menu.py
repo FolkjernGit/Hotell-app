@@ -11,14 +11,20 @@ def menu_interface():
 
             if choice == 1:
                 print(Room.show_avaible_rooms(session))
-                bajs = str(input("Vilket rum vill du boka?\n"))
+                choice = str(input("Vilket rum vill du boka?\n"))
                 
-                
-            if choice == 2:
+            elif choice == 2:
                 pass
             
-            if choice == 3:
+            elif choice == 3:
+                pass
+            
+            elif choice == 4:
                 break
             
+            else:
+                print("Ange nummer 1-4")
+                
         except(ValueError):
-            print("Ange ett av befintliga val")
+            print("Ogiltig input")
+        

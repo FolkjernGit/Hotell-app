@@ -2,8 +2,9 @@ from sqlalchemy.orm import Mapped, mapped_column
 from models.base import Base
 from shortcuts import pkey, str_255
 from typing import List
+from models.mixin import TimestampMixin, SoftDeletionMixin
 
-class Guest(Base):
+class Guest(SoftDeletionMixin,TimestampMixin,Base):
     __tablename__ = "guests"
     id: Mapped[pkey]
     first_name: Mapped[str_255]
