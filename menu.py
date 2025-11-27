@@ -1,5 +1,6 @@
-from models.room import Room
+from models.booking import Booking
 from database.db import My_Session
+from functions import check_month
 
 session = My_Session()
 
@@ -10,8 +11,9 @@ def menu_interface():
 
 
             if choice == 1:
-                print(Room.show_avaible_rooms(session))
-                choice = str(input("Vilket rum vill du boka?\n"))
+                month = int(input("Vilken månad vill du kolla 1-12\n"))
+                booked_dates = Booking.show_available_dates(session)
+                check_month(month,booked_dates,session)
                 
             elif choice == 2:
                 pass

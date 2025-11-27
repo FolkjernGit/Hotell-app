@@ -13,6 +13,9 @@ class Room(Base):
     booked: Mapped[bool] = mapped_column(Boolean)
     price_per_night: Mapped[dec]
     
+
+
+    
     @staticmethod
     def show_avaible_rooms(session): # TODO ändra till att kolla efter bokade datum
         

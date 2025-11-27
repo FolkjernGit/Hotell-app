@@ -13,6 +13,9 @@ class Guest(SoftDeletionMixin,TimestampMixin,Base):
     email: Mapped[str_255] = mapped_column(unique=True)
     booking_id: Mapped[int] = mapped_column(ForeignKey("bookings.id"))
     
+    def add_guest(self):
+        pass
+    
     # seeding
     @staticmethod
     def create_seeding() -> List["Guest"]:
