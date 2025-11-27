@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Boolean
 from models.base import Base
-from shortcuts import pkey, s_int
+from shortcuts import pkey, s_int, dec
 from typing import List
 
 
@@ -11,9 +11,10 @@ class Room(Base):
     room_number: Mapped[s_int]
     room_count: Mapped[s_int] 
     booked: Mapped[bool] = mapped_column(Boolean)
+    price_per_night: Mapped[dec]
     
     @staticmethod
-    def show_avaible_rooms(session):
+    def show_avaible_rooms(session): # TODO ändra till att kolla efter bokade datum
         
         available_rooms = (
             session.query(Room)\

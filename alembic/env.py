@@ -6,6 +6,7 @@ from models.base import Base
 from models.guest import Guest
 from models.room import Room
 from models.booking import Booking
+from models.invoice import Invoice
 from database.db import mysql_url
 from alembic import context
 

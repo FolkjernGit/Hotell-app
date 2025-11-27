@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import ForeignKey
 from models.base import Base
 from shortcuts import pkey, str_255
 from typing import List
@@ -10,6 +11,7 @@ class Guest(SoftDeletionMixin,TimestampMixin,Base):
     first_name: Mapped[str_255]
     last_name: Mapped[str_255]
     email: Mapped[str_255] = mapped_column(unique=True)
+    booking_id: Mapped[int] = mapped_column(ForeignKey("bookings.id"))
     
     # seeding
     @staticmethod
