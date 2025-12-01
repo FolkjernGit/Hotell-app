@@ -11,7 +11,7 @@ class Guest(SoftDeletionMixin,TimestampMixin,Base):
     first_name: Mapped[str_255]
     last_name: Mapped[str_255]
     email: Mapped[str_255] = mapped_column(unique=True)
-    booking_id: Mapped[int] = mapped_column(ForeignKey("bookings.id"))
+    booking_id: Mapped[int] = mapped_column(ForeignKey("bookings.id"),nullable=True)
     
     def add_guest(self):
         pass

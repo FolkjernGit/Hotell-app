@@ -1,6 +1,6 @@
 from models.guest import Guest
 from models.room import Room
-from datetime import datetime
+
 from typing import List
 from models.booking import Booking
 
@@ -19,12 +19,24 @@ def seeding(session):
         rooms = Room.create_seeding()  
         session.add_all(rooms) 
     
+    count = session.query(Booking).count()
+    if count == 0:
+        bookings = Booking.create_seeding(session)  
+        session.add_all(bookings) 
+    
     session.commit()
+
+def check_user(session,email) -> bool:
+    '''if user exists
+        return True else False
+    '''
+    emails: List[str] = [r[0] for r in session.query(Guest.email).all()]
     
-# TODO fix this
-def check_month(month,booked_dates,session) -> List[datetime]:
+    if email in emails:
+        return True
     
-    free_dates: List[datetime] = []
-    for day in range():
-        if day not in booked_dates:
-            pass
+    return False
+        
+        
+
+            
