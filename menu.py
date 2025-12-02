@@ -22,8 +22,10 @@ def menu_interface():
                     print(f"Room number {room[0]} Room count: {room[1]} Price per night {room[2]}")
                     
                 room = int(input(f"Ange nummer 1 - {len(existerande_room)}"))
+                
                 month = int(input("Vilken månad vill du kolla 1-12\n"))
-                bajs = Booking.check_rooms(session,month,existerande_room[3])
+                selected_room_id = session.query(Room.id).where(Room.room_number==room).scalar()
+                bajs = Booking.check_rooms(session,month,selected_room_id)
                 
                 for b in bajs:
                     print(b)
