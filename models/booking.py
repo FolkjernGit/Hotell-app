@@ -23,8 +23,22 @@ class Booking(TimestampMixin,Base):
     def __repr__(self):
         return f"Booked date:{self.book_date} Duration{self.booked_duration} RoomID:{self.room_id}"
     
+    @staticmethod
+    def create_booking(room_id: int,
+                       book_date: datetime,
+                       booked_duration: int
+                       ):
+        '''Metod för skapa bokningar,
+            returnerar ett objekt från Booking klassen
+        '''
+        new_booking = Booking(room_id=room_id,
+                            book_date=book_date,
+                            booked_duration=booked_duration
+                            )
+        return new_booking
+    
     @staticmethod # TODO fixa så inte dagar går över månadens dagar
-    def check_rooms( session, month : int, roomID) -> List[datetime]:
+    def check_rooms( session, month : int, room_id) -> List[datetime]:
         '''Tar in ett rum och månad och returnar en lista med 
             lediga datum för den månaden i det rummet
         '''
@@ -35,7 +49,7 @@ class Booking(TimestampMixin,Base):
         
         # hämtar all boknings datum och tid för det valda rummet som en tuple
         book = session.query(Booking.book_date,Booking.booked_duration)\
-            .where(Booking.room_id==roomID)\
+            .where(Booking.room_id==room_id)\
             .all()
         
         
@@ -54,44 +68,35 @@ class Booking(TimestampMixin,Base):
                 free_dates.append(f"{day} Booked")
             else:
                 free_dates.append(f"{day} Free to book")
-        return free_dates
-    
-    # @staticmethod
-    # def show_available_dates(session):
-    #     booked_dates: List[datetime] = []
-        
-    #     for booking in session.query(Booking)\
-    #         .all():
-    #         for i in range(booking.booked_duration): 
-    #             booked_dates.append(booking.book_date + timedelta(days=i))
-    #             booked_dates.append()
-                
-    #     return booked_dates
+        return free_dates, booked_dates
     
     @staticmethod
     def create_seeding(session):
         bookings: List[Booking] = []
 
         room_ids = [r[0] for r in session.query(Room.id).all()]
-
         year = 2025
-
 
         BOOKINGS_PER_MONTH = 1
 
-        for month in range(1, 13): 
+        for month in range(1, 13):
             _, num_days = calendar.monthrange(year, month)
 
             for _ in range(BOOKINGS_PER_MONTH):
                 room_id = choice(room_ids)
 
-                start_day = 1
+                duration = randint(1, 5)  # max 5 dagar
 
-                duration = 20
+                # se till att bokningen ryms i månaden
+                start_day = randint(1, num_days - duration + 1)
 
                 start_date = datetime(year, month, start_day)
 
-                booking = Booking(room_id=room_id,book_date=start_date,booked_duration=duration)
+                booking = Booking(
+                    room_id=room_id,
+                    book_date=start_date,
+                    booked_duration=duration
+                )
 
                 bookings.append(booking)
 
