@@ -3,6 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey, DateTime
 from datetime import datetime, timedelta
 from typing import List
+from models.guest import Guest
 from shortcuts import s_int
 
 import calendar
@@ -16,6 +17,7 @@ from shortcuts import pkey
 class Booking(TimestampMixin,Base):
     __tablename__ = "bookings"
     id: Mapped[pkey]
+    guest_id: Mapped[int] = mapped_column(ForeignKey("guests.id"))
     room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"))
     book_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     booked_duration: Mapped[s_int]
@@ -24,18 +26,32 @@ class Booking(TimestampMixin,Base):
         return f"Booked date:{self.book_date} Duration{self.booked_duration} RoomID:{self.room_id}"
     
     @staticmethod
-    def create_booking(room_id: int,
-                       book_date: datetime,
-                       booked_duration: int
-                       ):
+    def create_booking(session,
+                       room_number: int,
+                       email: str,
+                       book_day: int,
+                       booked_duration: int,
+                       month: int
+                       ) -> None:
         '''Metod för skapa bokningar,
             returnerar ett objekt från Booking klassen
         '''
+        room_id = session.query(Room.id)\
+            .where(Room.room_number==room_number)\
+            .scalar()
+        guest_id = session.query(Guest.id)\
+            .where(Guest.email==email)\
+            .scalar()
+        book_date = datetime(datetime.now().year,month,book_day)
+        
         new_booking = Booking(room_id=room_id,
+                            guest_id=guest_id,
                             book_date=book_date,
                             booked_duration=booked_duration
                             )
-        return new_booking
+        
+        session.add(new_booking)
+        session.commit()
     
     @staticmethod # TODO fixa så inte dagar går över månadens dagar
     def check_rooms( session, month : int, room_id) -> List[datetime]:
@@ -75,6 +91,7 @@ class Booking(TimestampMixin,Base):
         bookings: List[Booking] = []
 
         room_ids = [r[0] for r in session.query(Room.id).all()]
+        guest_ids = [r[0] for r in session.query(Guest.id).all()]
         year = 2025
 
         BOOKINGS_PER_MONTH = 1
@@ -84,7 +101,7 @@ class Booking(TimestampMixin,Base):
 
             for _ in range(BOOKINGS_PER_MONTH):
                 room_id = choice(room_ids)
-
+                guest_id = choice(guest_ids)
                 duration = randint(1, 5)  # max 5 dagar
 
                 # se till att bokningen ryms i månaden
@@ -94,6 +111,7 @@ class Booking(TimestampMixin,Base):
 
                 booking = Booking(
                     room_id=room_id,
+                    guest_id=guest_id,
                     book_date=start_date,
                     booked_duration=duration
                 )
@@ -102,4 +120,3 @@ class Booking(TimestampMixin,Base):
 
         return bookings
 
-        

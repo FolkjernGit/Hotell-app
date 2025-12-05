@@ -1,7 +1,6 @@
 from menu import menu_interface
 from database.db import My_Session
 from functions import seeding
-from models.booking import Booking
 
 def main():
     
@@ -12,7 +11,6 @@ def main():
         menu_interface()
         
         session.close()
-        
         
 if __name__ == "__main__":
     main()

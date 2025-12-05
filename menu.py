@@ -1,8 +1,10 @@
 from models.booking import Booking
 from database.db import My_Session
 from functions import check_user
+from models.invoice import Invoice
 from models.room import Room
 import calendar
+from datetime import datetime
 
 session = My_Session()
 
@@ -18,9 +20,9 @@ def menu_interface():
             continue
 
         if choice == 1:
-            new_guest = str(input("Enter email\n"))
-            if check_user(session,new_guest):
-                print(f"Bokar rum åt addressen '{new_guest}'")
+            email = str(input("Enter email\n"))
+            if check_user(session,email):
+                print(f"Bokar rum åt addressen '{email}'")
             else:
                 pass # TODO lägg till nu användare
             print("Vilket rum vill du boka:")
@@ -28,16 +30,37 @@ def menu_interface():
             for room in existerande_room:
                 print(f"Room number {room[0]} Room count: {room[1]} Price per night {room[2]}")
                 
-            room = int(input(f"Ange rum nummer 1 - {len(existerande_room)}\n> "))
+            try:
+                room_number = int(input(f"Ange rum nummer 1 - {len(existerande_room)}\n> "))
+            except ValueError:
+                print("Välj ett giltigt nummer!")
+            except room_number < 1 or room_number > len(existerande_room):
+                print("Det rum numret finns inte!")
+
+            try:
+                month = int(input("Vilken månad vill du boka: 1-12\n> "))
+            except ValueError:
+                print("Välj ett giltigt nummer!")
+                continue
+            except month < 1 or month > 12:
+                print("Välj en riktig månad!")
+                continue
             
-            month = int(input("Vilken månad vill du boka: 1-12\n> "))
             selected_room_id = session.query(Room.id).where(Room.room_number==room).scalar()
             checked_month, booked_dates = Booking.check_rooms(session,month,selected_room_id)
             
             for date in checked_month:
                 print(date)
-                
-            choose_date = int(input("Välj en dag som startdatum\n > "))
+            
+            try:
+                choose_date = int(input("Välj en dag som startdatum\n > "))
+            except ValueError:
+                print("Välj ett giltigt datum!")
+                continue
+            except choose_date not in calendar.monthrange(datetime.now().year,month):
+                print("Välj ett datum i den här månaden!")
+                continue
+            
             choose_duration = 1
             if choose_date in booked_dates:
                 print("Datumet är redan bokat!")
@@ -52,11 +75,13 @@ def menu_interface():
             else:
                 print("idk what u did man")
             
-            confirm = str(input(f"Bekräfta bokning för {new_guest} {calendar.month_name[month]}\
+            confirm = str(input(f"Bekräfta bokning för {email} {calendar.month_name[month]}\
                   dag {choose_date} till {choose_date+choose_duration-1}\nJ/N\n> "))
             
             if confirm == "J".upper():
-                pass
+                amount = Invoice.get_amount(session,choose_duration,room_number)
+                Booking.create_booking(session,room_number,email,choose_date,choose_duration,month)
+                Invoice.create_invoice(session,email,room_number,amount)
             else:
                 continue
             
@@ -72,5 +97,3 @@ def menu_interface():
         else:
             print("Ange nummer 1-4")
             
-
-    
