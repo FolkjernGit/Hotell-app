@@ -27,6 +27,12 @@ class Invoice(TimestampMixin,Base):
        
     @staticmethod
     def get_invoice_object(session,email):
+        if email == 0:
+            invoice = session.query(Invoice)\
+                .where(Invoice.paid == False)\
+                .where(Invoice.expired == False)\
+                .all()
+            return invoice 
         invoice = session.query(Invoice)\
             .join(Guest, Invoice.guest_id == Guest.id)\
             .where(Guest.email == email)\
