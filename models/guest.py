@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey
 from models.base import Base
-from shortcuts import pkey, str_255, s_int
+from shortcuts import pkey, str_255
 from typing import List
 from models.mixin import TimestampMixin, SoftDeletionMixin
 
@@ -11,11 +11,15 @@ class Guest(SoftDeletionMixin,TimestampMixin,Base):
     first_name: Mapped[str_255]
     last_name: Mapped[str_255]
     email: Mapped[str_255] = mapped_column(unique=True)
-    #rooms_booked: Mapped[s_int]
     
-    def add_guest(self):
-        pass
-
+    @staticmethod
+    def add_guest(session, full_name, email):
+        first_name, last_name = full_name.split()
+        new_guest = Guest(first_name=first_name,
+                          last_name=last_name,
+                          email=email)
+        session.add(new_guest)
+        session.commit()
     
     # seeding
     @staticmethod

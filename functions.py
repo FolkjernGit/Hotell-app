@@ -1,4 +1,5 @@
 from models.guest import Guest
+from models.invoice import Invoice
 from models.room import Room
 
 from typing import List
@@ -37,6 +38,9 @@ def check_user(session,email) -> bool:
     
     return False
         
+def get_invoices(session):
+    invoices = session.query(Invoice).all()
+    return invoices   
         
 
             
