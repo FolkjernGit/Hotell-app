@@ -39,13 +39,15 @@ def seeding(session):
     room_dict = {r.id: (r.room_number, r.price_per_night) for r in rooms}
     guest_ids = [g.id for g in guests]
 
-    year = 2025
-    bookings_per_month = 10
+    
+    bookings_per_month = 2
 
     for month in range(1, 13):
+        year = 2025
         _, num_days = calendar.monthrange(year, month)
 
         for _ in range(bookings_per_month):
+            year = randint(2020,2025)
             room_id = choice(list(room_dict.keys()))
             guest_id = choice(guest_ids)
             duration = randint(1, 5)

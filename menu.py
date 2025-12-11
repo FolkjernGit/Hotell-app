@@ -3,7 +3,7 @@ from database.db import My_Session
 from functions import check_user, get_invoices
 from models.guest import Guest
 from models.invoice import Invoice
-from models.queries import get_booking_stats, get_total_spent
+from queries import get_booking_stats, get_total_spent
 from models.room import Room
 import calendar
 from datetime import datetime
@@ -113,7 +113,7 @@ def menu_interface():
                   dag {choose_date} till {choose_date+choose_duration-1}\nJ/N\n> "))
             
             if confirm == "J".upper():
-                amount = Invoice.get_amount(session,choose_duration,room_number)
+                amount = Invoice.get_amount(session,choose_duration,room_number,people)
                 Booking.create_booking(session,room_number,email,choose_date,choose_duration,month,people)
                 Invoice.create_invoice(session,email,room_number,amount)
                 print(f"Bokning genomförd för {email} faktura skickad")

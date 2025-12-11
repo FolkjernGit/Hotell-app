@@ -1,4 +1,5 @@
 import calendar
+import uuid
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import ForeignKey, DateTime, String, func
 from datetime import datetime, timedelta
@@ -7,16 +8,15 @@ from models.guest import Guest
 from shortcuts import s_int
 
 import calendar
-from random import choice, randint
 from models.room import Room
 from models.base import Base
 from models.mixin import TimestampMixin
-from shortcuts import pkey
+
 
 
 class Booking(TimestampMixin,Base):
     __tablename__ = "bookings"
-    id: Mapped[str] = mapped_column(String(32), primary_key=True)
+    id: Mapped[str] = mapped_column(String(32), primary_key=True, default=lambda: uuid.uuid4().hex)
 
     guest_id: Mapped[int] = mapped_column(ForeignKey("guests.id"))
     room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"))
@@ -27,7 +27,7 @@ class Booking(TimestampMixin,Base):
     def __repr__(self):
         return f"Booked date:{self.book_date} Duration{self.booked_duration} RoomID:{self.room_id}"
     
-    @staticmethod
+    @staticmethod # TODO kolla om gäst är raderad
     def create_booking(session,
                        room_number: int,
                        email: str,
