@@ -15,6 +15,7 @@ class Guest(SoftDeletionMixin,TimestampMixin,Base):
     @staticmethod
     def add_guest(session, full_name, email):
         first_name, last_name = full_name.split()
+        first_name, last_name = first_name.capitalize(), last_name.capitalize()
         new_guest = Guest(first_name=first_name,
                           last_name=last_name,
                           email=email)

@@ -1,6 +1,6 @@
 import calendar
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey, DateTime
+from sqlalchemy import ForeignKey, DateTime, String, func
 from datetime import datetime, timedelta
 from typing import List
 from models.guest import Guest
@@ -16,11 +16,13 @@ from shortcuts import pkey
 
 class Booking(TimestampMixin,Base):
     __tablename__ = "bookings"
-    id: Mapped[pkey]
+    id: Mapped[str] = mapped_column(String(32), primary_key=True)
+
     guest_id: Mapped[int] = mapped_column(ForeignKey("guests.id"))
     room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"))
     book_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     booked_duration: Mapped[s_int]
+    people: Mapped[s_int]
     
     def __repr__(self):
         return f"Booked date:{self.book_date} Duration{self.booked_duration} RoomID:{self.room_id}"
@@ -31,7 +33,8 @@ class Booking(TimestampMixin,Base):
                        email: str,
                        book_day: int,
                        booked_duration: int,
-                       month: int
+                       month: int,
+                       people: int
                        ) -> None:
         '''Metod för skapa bokningar,
             returnerar ett objekt från Booking klassen
@@ -47,7 +50,8 @@ class Booking(TimestampMixin,Base):
         new_booking = Booking(room_id=room_id,
                             guest_id=guest_id,
                             book_date=book_date,
-                            booked_duration=booked_duration
+                            booked_duration=booked_duration,
+                            people=people
                             )
         
         session.add(new_booking)
@@ -61,13 +65,13 @@ class Booking(TimestampMixin,Base):
         year: DateTime[year] = datetime.now().year
         free_dates: List[datetime] = []
 
-        _, num_days = calendar.monthrange(year, month) # Jag använder _ för att jag bara bryr mig om antal dagar
+        _, num_days = calendar.monthrange(year, month)
         
         # hämtar all boknings datum och tid för det valda rummet som en tuple
         book = session.query(Booking.book_date,Booking.booked_duration)\
             .where(Booking.room_id==room_id)\
             .all()
-        
+
         
         # [(datetime(2025, 8, 20, 0, 0), 3), (datetime(2025, 8, 25, 0, 0), 2)]
         booked_dates = []
@@ -77,7 +81,7 @@ class Booking(TimestampMixin,Base):
             duration = b[1]
             for i in range(duration):
                 booked_dates.append(start_date.day + i)
-        print(booked_dates)
+
 
         for day in range(1, num_days + 1):
             if day in booked_dates:
@@ -86,37 +90,5 @@ class Booking(TimestampMixin,Base):
                 free_dates.append(f"{day} Free to book")
         return free_dates, booked_dates
     
-    @staticmethod
-    def create_seeding(session):
-        bookings: List[Booking] = []
 
-        room_ids = [r[0] for r in session.query(Room.id).all()]
-        guest_ids = [r[0] for r in session.query(Guest.id).all()]
-        year = 2025
-
-        BOOKINGS_PER_MONTH = 1
-
-        for month in range(1, 13):
-            _, num_days = calendar.monthrange(year, month)
-
-            for _ in range(BOOKINGS_PER_MONTH):
-                room_id = choice(room_ids)
-                guest_id = choice(guest_ids)
-                duration = randint(1, 5)  # max 5 dagar
-
-                # se till att bokningen ryms i månaden
-                start_day = randint(1, num_days - duration + 1)
-
-                start_date = datetime(year, month, start_day)
-
-                booking = Booking(
-                    room_id=room_id,
-                    guest_id=guest_id,
-                    book_date=start_date,
-                    booked_duration=duration
-                )
-
-                bookings.append(booking)
-
-        return bookings
 

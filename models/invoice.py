@@ -1,6 +1,7 @@
+from typing import List
 from models.base import Base
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey, Boolean
+from sqlalchemy import ForeignKey, Boolean, String
 from models.booking import Booking
 from models.guest import Guest
 from models.mixin import TimestampMixin
@@ -13,7 +14,7 @@ class Invoice(TimestampMixin,Base):
     id: Mapped[pkey]
     amount: Mapped[dec]
     guest_id: Mapped[int] = mapped_column(ForeignKey("guests.id"))
-    booking_id: Mapped[int] = mapped_column(ForeignKey("bookings.id"))
+    booking_id: Mapped[str] = mapped_column(String(36), ForeignKey("bookings.id"))
     paid: Mapped[bool] = mapped_column(Boolean)
     price_per_night: Mapped[dec]
     expired: Mapped[bool] = mapped_column(Boolean)
@@ -42,18 +43,19 @@ class Invoice(TimestampMixin,Base):
         return invoice   
     
     @staticmethod
-    def get_amount(session, duration, room_number) -> int:
+    def get_amount(session, duration, room_number, people) -> int:
         '''Takes duration and price_per_night and returns product
         '''
         price_per_night = session.query(Room.price_per_night)\
             .where(Room.room_number==room_number)\
             .scalar()
             
-        return price_per_night * duration
+            
+        return (price_per_night * duration) + (people * 50) - 50
     
     @staticmethod
     def get_invoice(session,email):
-        invoice_query = session.query(Invoice.amount,Invoice.price_per_night,Guest.email,Booking.booked_duration)\
+        invoice_query = session.query(Invoice.amount,Invoice.price_per_night,Guest.email,Booking.booked_duration,Booking.people)\
             .join(Guest ,Invoice.guest_id==Guest.id)\
             .join(Booking, Invoice.booking_id==Booking.id)\
             .where(Invoice.expired==False)\
@@ -62,8 +64,8 @@ class Invoice(TimestampMixin,Base):
             .all()
         
         invoice_string = ""
-        for amount, price, guest, days in invoice_query:
-            invoice_string+=f"{guest} bokade {days} dagar för {str(price)}/dag. Total: {str(amount)}kr\n"
+        for amount, price, guest, days, people in invoice_query:
+            invoice_string+=f"{guest} bokade {days} dagar för {str(price)}/dag + 50/per extra person({people*50}).\nTotal: {str(amount)}kr\n"
         return invoice_string
     
             
@@ -96,3 +98,11 @@ class Invoice(TimestampMixin,Base):
 
         session.add(new_invoice)
         session.commit()
+    
+    @staticmethod
+    def create_seeding(session):
+        invoices: List[Invoice] = []
+        
+        booking_id = [r[0] for r in session.query(Booking.id).all()]
+        guest_ids = [r[0] for r in session.query(Guest.id).all()]
+        

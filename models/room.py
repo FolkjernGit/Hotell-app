@@ -14,8 +14,6 @@ class Room(Base):
     price_per_night: Mapped[dec]
     
     
-    def book_room(self):
-        pass
     
     @staticmethod
     def create_seeding() -> List["Room"]:
