@@ -10,7 +10,7 @@ def get_booking_stats(session):
     query = session.query(func.count(Booking.id),Guest.first_name)\
         .join(Guest, Booking.guest_id == Guest.id)\
         .where(Guest.is_deleted==False)\
-        .order_by(func.count(Booking.id).desc())\
+        .order_by(func.count(Booking.id).asc())\
         .group_by(Guest.id, Guest.first_name)\
         .all()
     booking_stats = "Boknings statistik"
@@ -24,7 +24,7 @@ def get_total_spent(session):
     query = session.query(Guest.first_name,func.sum(Invoice.amount))\
         .join(Guest, Invoice.guest_id == Guest.id)\
         .where(Guest.is_deleted==False)\
-        .order_by(func.sum(Invoice.amount))\
+        .order_by(func.sum(Invoice.amount).desc())\
         .group_by(Guest.id, Guest.first_name)\
         .all()
     booking_stats = "Mest spenderat"

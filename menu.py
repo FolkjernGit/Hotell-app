@@ -39,7 +39,7 @@ def menu_interface():
                         print("Namn kan inte ha siffror eller andra tecken!")
 
                     Guest.add_guest(session,fullname,email)
-                    print(f"La till användaren {email}, med namn {fullname}")
+                    print(f"La till användaren {email}, med namn {fullname.capitalize()}")
                     break
                 
             while True:
