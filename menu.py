@@ -1,3 +1,5 @@
+from tokenize import String
+from sqlalchemy import func
 from models.booking import Booking
 from database.db import My_Session
 from functions import check_user, get_invoices
@@ -122,7 +124,11 @@ def menu_interface():
                 continue
             
         elif choice == 2:
-            email = str(input("Enter email\n"))
+            try:
+                email = str(input("Enter email\n"))
+            except ValueError:
+                print("Ogiltig input!")
+                continue
             if not check_user(session,email):
                 print("Användaren finns inte!")
                 time.sleep(0.6)
@@ -148,8 +154,102 @@ def menu_interface():
             print(get_booking_stats(session))
             print(get_total_spent(session))
         elif choice == 4:
+            choice = int(input("ADMIN MENY\n1. Ändra boking\n2. Ändra kund info\n3. Ta bort kund\n> "))
+            if choice == 1:
+                try:
+                    email = str(input("Ange email för användare\n> "))
+                except ValueError:
+                    print("Ogiltig input")
+                    continue
+                if not check_user(session,email):
+                    print("Användare finns inte!")
+                    continue
+                guest_id = session.query(Guest.id).where(Guest.email==email).scalar()
+                bookings = session.query(Booking).where(Booking.guest_id==Guest.id)\
+                    .where(Booking.people < 999).all()
+                for booking in bookings:
+                    print(f"Bokning id: {booking.id} Rum id: {booking.room_id} Start datum: {booking.book_date} Antal dagar: {booking.booked_duration} Antal personer: {booking.people}")
+                booking_id = str(input("Ange boknings id att ändra\n> "))
+                booking = session.query(Booking).where(Booking.id==booking_id).first()  
+                choice = str(input("1. Lägg till dagar\n2. Ändra antal personer\n> "))
+                if choice == "1":
+                    invalid = False
+                    try:
+                        extra_days = int(input("Hur många extra dagar vill du lägga till?\n> "))
+                    except ValueError:
+                        print("Ogiltig input")
+                        continue
+                    free_dates,_ = Booking.check_rooms(session,booking.book_date.month,booking.room_id)
+                    for date in range(booking.book_date.day, booking.book_date.day + booking.booked_duration + extra_days):
+                        if booking.book_date.day + booking.booked_duration + extra_days -1 not in free_dates:
+                            print("Kan inte lägga till dagar, datum är redan bokat!")
+                            invalid = True
+                            break
+                    if invalid:
+                        continue
+                    booking.booked_duration += extra_days
+                    session.commit()
+                elif choice == "2":
+                    try:
+                        new_people = int(input("Ange nytt antal personer 1-4\n> "))
+                    except ValueError:
+                        print("Ogiltig input")
+                        continue
+                    if new_people < 1 or new_people > 4:
+                        print("Max 4 personer per rum!")
+                        continue
+                    booking.people = new_people
+                    session.commit()
+                    
+            elif choice == 2:
+                try:
+                    email = str(input("Ange email för användare\n> "))
+                except ValueError:
+                    print("Ogiltig input")
+                if check_user(session,email):
+                    while True:
+                        try:
+                            fullname = str(input("Fyll i förnamn <space> efternamn\n"))
+                            if len(fullname.split()) != 2:
+                                print("Fel format skriv: förnamn <space> efternamn")
+                                continue
+                            
+                        except ValueError:
+                            print("Namn kan inte ha siffror eller andra tecken!")
+                        f_name, l_name = fullname.split()
+                        guest = session.query(Guest).where(Guest.email==email).first()
+                        guest.first_name = f_name.capitalize()
+                        guest.last_name = l_name.capitalize()
+
+                        session.commit()
+                        print("Namn ändrat!")
+                        break
+                else:
+                    print("Användare finns inte!")
+            elif choice == 3:
+                try:
+                    email = str(input("Ange email för användare\n> "))
+                except ValueError:
+                    print("Ogiltig input")
+                if not check_user(session,email):
+                    print("Användare finns inte!")
+                    continue
+                guest_id = session.query(Guest.id).where(Guest.email==email).scalar()
+                if session.query(Booking)\
+                    .where(Booking.people < 999)\
+                    .where(Booking.guest_id==guest_id)\
+                    .all():
+                    print("Användaren har aktiva bokningar, kan inte ta bort!")
+                    continue
+                guest = session.query(Guest).where(Guest.email==email).first()
+                guest.is_deleted = True
+                session.commit()
+                print("Användare borttagen!")
+
+            else:
+                pass
+        elif choice == 5:
             break
-        
         else:
             print("Ange nummer 1-4")
             

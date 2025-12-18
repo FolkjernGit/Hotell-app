@@ -1,6 +1,6 @@
 from menu import menu_interface
 from database.db import My_Session
-from functions import seeding
+from functions import check_expired_bookings, seeding
 from models.invoice import Invoice
 
 def main():
@@ -10,6 +10,8 @@ def main():
         invoices = Invoice.get_invoice_object(session,0)
         for invoice in invoices:
             invoice.check_if_expired()
+        
+        check_expired_bookings(session)
         
         seeding(session)
 

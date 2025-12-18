@@ -1,5 +1,5 @@
 import calendar
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import choice, randint
 import uuid
 from models.guest import Guest
@@ -93,7 +93,7 @@ def check_user(session,email) -> bool:
     '''if user exists
         return True else False
     '''
-    emails: List[str] = [r[0] for r in session.query(Guest.email).all()]
+    emails: List[str] = [r[0] for r in session.query(Guest.email).where(Guest.is_deleted==False).all()]
     
     if email in emails:
         return True
@@ -104,7 +104,14 @@ def get_invoices(session):
     invoices = session.query(Invoice).all()
     return invoices
 
-   
-        
+def check_expired_bookings(session):
+    expired_bookings = session.query(Booking).all()
+    expired_bookings = [
+        b for b in expired_bookings
+        if b.book_date + timedelta(days=b.booked_duration) < datetime.now()
+    ]
+    for booking in expired_bookings:
+        booking.people = 999  # Mark as expired
+        session.commit()  
 
             

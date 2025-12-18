@@ -65,7 +65,7 @@ class Invoice(TimestampMixin,Base):
         
         invoice_string = ""
         for amount, price, guest, days, people in invoice_query:
-            invoice_string+=f"{guest} bokade {days} dagar för {str(price)}/dag + 50/per extra person({people*50}).\nTotal: {str(amount)}kr\n"
+            invoice_string+=f"{guest} bokade {days} dagar för {str(price)}/dag + 50/per extra person.\nTotal: {str(amount)}kr\n"
         return invoice_string
     
             
