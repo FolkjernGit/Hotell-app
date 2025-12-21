@@ -114,4 +114,15 @@ def check_expired_bookings(session):
         booking.people = 999  # Mark as expired
         session.commit()  
 
-            
+from datetime import datetime
+
+def read_date(prompt):
+    while True:
+        try:
+            return datetime.strptime(
+                input(prompt),
+                "%Y-%m-%d"
+            ).date()
+        except ValueError:
+            print("Fel datumformat. Använd YYYY-MM-DD")
+     
