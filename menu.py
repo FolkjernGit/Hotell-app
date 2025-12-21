@@ -16,10 +16,18 @@ session = My_Session()
 def menu_interface():
     while True:
         try:
-            choice = int(input("Lindas Lustfyllda Hotell & Pensionat\
-                \n       --Val--\n=====================\n| 1. Boka rum       |\
-                    \n| 2. Betala faktura |\n| 3. Statistik meny |\n| 4. Avsluta        |\
-                        \n=====================\n> "))
+            choice = int(input(
+                "Lindas Lustfyllda Hotell & Pensionat"
+                "\n        -- Val --"
+                "\n====================="
+                "\n| 1. Boka rum       |"
+                "\n| 2. Betala faktura |"
+                "\n| 3. Statistik meny |"
+                "\n| 4. Admin meny     |"
+                "\n| 5. Avsluta        |"
+                "\n====================="
+                "\n> "
+            ))
         except ValueError:
             print("Välj ett av valen ovan!")
             continue
@@ -28,12 +36,15 @@ def menu_interface():
             email = str(input("Enter email\n"))
             if check_user(session,email):
                 print(f"Bokar rum åt addressen '{email}'")
+            elif len(email) > 255
+                print("Email för lång!")
+                continue
             else:
                 print("Ny användare!")
                 while True:
                     try:
                         fullname = str(input("Fyll i förnamn <space> efternamn\n"))
-                        if len(fullname.split()) != 2:
+                        if len(fullname.split()) != 2 or len(fullname.split()[0]) > 255 or len(fullname.split()[1]) > 255:
                             print("Fel format skriv: förnamn <space> efternamn")
                             continue
                         
