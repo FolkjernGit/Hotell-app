@@ -69,6 +69,7 @@ class Booking(TimestampMixin,Base):
         
         # hämtar all boknings datum och tid för det valda rummet som en tuple
         book = session.query(Booking.book_date,Booking.booked_duration)\
+            .where(func.strftime('%Y', Booking.book_date) == str(year))\
             .where(Booking.room_id==room_id)\
             .all()
 
