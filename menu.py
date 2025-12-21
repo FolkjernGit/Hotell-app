@@ -2,7 +2,7 @@ from tokenize import String
 from sqlalchemy import func
 from models.booking import Booking
 from database.db import My_Session
-from functions import check_user, get_invoices
+from functions import check_user, get_invoices, read_date
 from models.guest import Guest
 from models.invoice import Invoice
 from queries import get_booking_stats, get_total_spent
@@ -162,8 +162,42 @@ def menu_interface():
                 print(f"Betalning lyckades för {invoice.amount}kr")
             
         elif choice == 3:
-            print(get_booking_stats(session))
-            print(get_total_spent(session))
+            while True:
+                print(
+                    "\n--- Statistik meny ---"
+                    "\n1. Bokningar per gäst"
+                    "\n2. Mest spenderat per gäst"
+                    "\n3. Mest bokade rum (datumintervall)"
+                    "\n4. Avsluta"
+                )
+        
+                try:
+                    stat_choice = int(input("> "))
+                except ValueError:
+                    print("Välj ett nummer 1–4")
+                    continue
+        
+                if stat_choice == 1:
+                    print(get_booking_stats(session))
+        
+                elif stat_choice == 2:
+                    print(get_total_spent(session))
+        
+                elif stat_choice == 3:
+                    start = read_date("Startdatum (YYYY-MM-DD): ")
+                    end = read_date("Slutdatum (YYYY-MM-DD): ")
+        
+                    if start > end:
+                        print("Startdatum kan inte vara efter slutdatum")
+                        continue
+        
+                    print(get_most_booked(session, start, end))
+        
+                elif stat_choice == 4:
+                    break
+        
+                else:
+                    print("Ogiltigt val")
         elif choice == 4:
             choice = int(input("ADMIN MENY\n1. Ändra boking\n2. Ändra kund info\n3. Ta bort kund\n> "))
             if choice == 1:
