@@ -4,6 +4,7 @@ from sqlalchemy import func, String
 from models.booking import Booking
 from models.guest import Guest
 from models.invoice import Invoice
+from models.room import Room
 
 
 def get_booking_stats(session):
@@ -34,11 +35,11 @@ def get_total_spent(session):
     return booking_stats
 
 def get_most_booked(session, from_date, to_date):
-    end_date = func.date(Booking.start_date, '+' + func.cast(Booking.duration, String) + ' days')
+    end_date = func.date(Booking.book_date, '+' + func.cast(Booking.booked_duration, String) + ' days')
 
     query = session.query(Room.room_number,func.count(Booking.id))\
         .join(Booking, Booking.room_id == Room.id)\
-        .where(Booking.start_date <= to_date, end_date >= from_date)\
+        .where(Booking.book_date <= to_date, end_date >= from_date)\
         .group_by(Room.id, Room.room_number)\
         .order_by(func.count(Booking.id).desc())\
         .all()

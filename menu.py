@@ -5,7 +5,7 @@ from database.db import My_Session
 from functions import check_user, get_invoices, read_date
 from models.guest import Guest
 from models.invoice import Invoice
-from queries import get_booking_stats, get_total_spent
+from queries import get_booking_stats, get_most_booked, get_total_spent
 from models.room import Room
 import calendar
 from datetime import datetime
@@ -36,7 +36,7 @@ def menu_interface():
             email = str(input("Enter email\n"))
             if check_user(session,email):
                 print(f"Bokar rum åt addressen '{email}'")
-            elif len(email) > 255
+            elif len(email) > 255:
                 print("Email för lång!")
                 continue
             else:
