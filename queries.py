@@ -1,5 +1,5 @@
 
-from sqlalchemy import func
+from sqlalchemy import func, String
 
 from models.booking import Booking
 from models.guest import Guest
@@ -32,3 +32,20 @@ def get_total_spent(session):
         booking_stats += f"\n{name}: {amount} spenderat"
     
     return booking_stats
+
+def get_most_booked(session, from_date, to_date):
+    end_date = func.date(Booking.start_date, '+' + func.cast(Booking.duration, String) + ' days')
+
+    query = session.query(Room.room_number,func.count(Booking.id))\
+        .join(Booking, Booking.room_id == Room.id)\
+        .where(Booking.start_date <= to_date, end_date >= from_date)\
+        .group_by(Room.id, Room.room_number)\
+        .order_by(func.count(Booking.id).desc())\
+        .all()
+    
+
+    stats = f"Mest bokade rum mellan {from_date} och {to_date}"
+    for room, count in query:
+        stats += f"\nRum {room}: {count} bokningar"
+
+    return stats
