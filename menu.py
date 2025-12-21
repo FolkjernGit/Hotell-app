@@ -199,7 +199,11 @@ def menu_interface():
                 else:
                     print("Ogiltigt val")
         elif choice == 4:
-            choice = int(input("ADMIN MENY\n1. Ändra boking\n2. Ändra kund info\n3. Ta bort kund\n> "))
+            try:
+                choice = int(input("ADMIN MENY\n1. Ändra boking\n2. Ändra kund info\n3. Ta bort kund\n> "))
+            except ValueError:
+                print("Ogiltig input")
+                continue
             if choice == 1:
                 try:
                     email = str(input("Ange email för användare\n> "))
