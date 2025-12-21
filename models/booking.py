@@ -68,10 +68,14 @@ class Booking(TimestampMixin,Base):
         _, num_days = calendar.monthrange(year, month)
         
         # hämtar all boknings datum och tid för det valda rummet som en tuple
-        book = session.query(Booking.book_date,Booking.booked_duration)\
-            .where(func.strftime('%Y', Booking.book_date) == str(year))\
-            .where(Booking.room_id==room_id)\
+        bookings_all = session.query(Booking.book_date, Booking.booked_duration)\
+            .where(Booking.room_id == room_id)\
             .all()
+    
+        # Filtrera i Python på året
+        book = [(b[0], b[1]) for b in bookings_all if b[0].year == year]
+    
+        booked_dates = set()
 
         
         # [(datetime(2025, 8, 20, 0, 0), 3), (datetime(2025, 8, 25, 0, 0), 2)]
